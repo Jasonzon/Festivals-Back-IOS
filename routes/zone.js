@@ -12,6 +12,17 @@ router.get("/", async (req,res) => {
     }
 })
 
+router.get("/festival/:id", async (req,res) => {
+    try {
+        const {id} = req.params
+        const allZones = await pool.query("select * from zone where zone_festival = $1",[id])
+        return res.status(200).json(allZones.rows)
+    } catch (err) {
+        console.error(err.message)
+        return res.status(500).send("Server error")
+    }
+})
+
 router.get("/:id", async (req,res) => {
     try {
         const {id} = req.params

@@ -59,12 +59,11 @@ router.put("/:id", auth, async (req,res) => {
     try {
         if (req.role === "Admin") {
             const {id} = req.params
-            const {name,debut,fin,date,festival} = req.body
-            const check = await pool.query("select * from festival where festival_id = $1",[festival])
-            if (!name || !debut || !fin || !date || !festival || typeof debut !== "string" || typeof fin !== "string" || typeof date !== "string" || typeof festival !== "number" || typeof name !== "string" || name.length === 0 || debut.length === 0 || fin.length === 0 || date.length === 0 || check.rows.length === 0) {
+            const {name} = req.body
+            if (!name || typeof name !== "string" || name.length === 0) {
                 return res.status(409).send("Wrong body")
             }
-            const jour = await pool.query("update jour set jour_name = $2, jour_debut = $3, jour_fin = $4, jour_date = $5, jour_festival = $6 where jour_id = $1 returning *",[id,name,debut,fin,date,festival])
+            const jour = await pool.query("update jour set jour_name = $2 where jour_id = $1 returning *",[id,name])
             return res.status(200).json(jour.rows[0])
         }
         return res.status(403).send("Not Authorized")

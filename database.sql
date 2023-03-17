@@ -4,10 +4,7 @@ create table festival(
     festival_id serial primary key,
     festival_name varchar(255) not null,
     festival_year varchar(255) not null,
-    festival_days int not null,
     festival_open boolean not null
-    festival_debut date not null,
-    festival_fin date not null
 );
 
 create table jour(
