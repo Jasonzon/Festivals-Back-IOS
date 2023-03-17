@@ -28,28 +28,12 @@ create table benevole(
     polyuser_role user_role default 'Basic'
 );
 
-create type type_jeu as enum ('Enfant','Famille','Ambiance','Initie','Expert');
-
-create table jeu(
-    jeu_id serial primary key,
-    jeu_name varchar(255) not null,
-    jeu_type type_jeu not null
-);
-
 create table zone(
     zone_id serial primary key,
     zone_name varchar(255) not null,
     zone_benevoles int not null,
     zone_festival int not null,
     foreign key (zone_festival) references festival(festival_id) on delete cascade
-);
-
-create table affectation(
-    affectation_id serial primary key,
-    affectation_jeu int not null,
-    foreign key (affectation_jeu) references jeu(jeu_id) on delete cascade,
-    affectation_zone int not null,
-    foreign key (affectation_zone) references zone(zone_id) on delete cascade
 );
 
 create table creneau(

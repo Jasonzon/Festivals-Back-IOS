@@ -35,7 +35,7 @@ router.post("/", auth, async (req,res) => {
             }
             const festival = await pool.query("insert into festival (festival_name, festival_year, festival_open) values ($1, $2, $3) returning *",[name,year,open])
             await pool.query("insert into zone(zone_name,zone_benevoles,zone_festival) values ($1, $2, $3)",["Zone libre",3,festival.rows[0].festival_id])
-            return res.status(200).json(festival.rows[0])
+            return res.status(200).json({ID:festival.rows[0].festival_id})
         }
         return res.status(403).send("Not Authorized")
     } catch (err) {
@@ -53,7 +53,7 @@ router.put("/:id", auth, async (req,res) => {
                 return res.status(400).send("Wrong body")
             }
             const festival = await pool.query("update festival set festival_name = $2, festival_year = $3, festival_open = $4 where festival_id = $1 returning *",[id,name,year,open])
-            return res.status(200).json(festival.rows[0])
+            return res.status(200).json({ID:festival.rows[0].festival_id})
         }
         return res.status(403).send("Not Authorized")
     } catch (err) {

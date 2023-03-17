@@ -5,18 +5,7 @@ const auth = require("../utils/auth")
 router.get("/", async (req,res) => {
     try {
         const creneaux = await pool.query("select * from creneau")
-        const creneauxModifies = creneaux.rows.map((creneau) => {
-            const debutModifie = new Date(creneau.creneau_debut)
-            debutModifie.setHours(debutModifie.getHours() + 1)
-            const finModifie = new Date(creneau.creneau_fin)
-            finModifie.setHours(finModifie.getHours() + 1)
-            return {
-                creneau_id: creneau.creneau_id,
-                creneau_debut: debutModifie.toISOString(),
-                creneau_fin: finModifie.toISOString()
-            }
-        })
-        return res.status(200).json(creneauxModifies)
+        return res.status(200).json(creneaux.rows)
     } catch (err) {
         console.error(err.message)
         return res.status(500).send("Server error")
@@ -51,12 +40,12 @@ router.get("/jour/:id", async (req,res) => {
 router.post("/", auth, async (req,res) => {
     try {
         if (req.role === "Admin") {
-            const {debut,fin} = req.body
-            if (!debut || !fin || typeof debut !== "string" || typeof fin !== "string" || debut >= fin) {
+            const {debut,fin,jour} = req.body
+            if (!debut || !fin || !jour || typeof jour !== "number" || typeof debut !== "string" || typeof fin !== "string" || debut >= fin) {
                 return res.status(400).send("Wrong body")
             }
-            const creneau = await pool.query("insert into creneau (creneau_debut,creneau_fin) values ($1::timestamp,$2::timestamp) returning *",[debut,fin])
-            return res.status(200).json(creneau.rows[0])
+            const creneau = await pool.query("insert into creneau (creneau_debut,creneau_fin,creneau_jour) values ($1,$2,$3) returning *",[debut,fin,jour])
+            return res.status(200).json({ID:creneau.rows[0].creneau_id})
         }
         return res.status(403).send("Not Authorized")
     } catch (err) {

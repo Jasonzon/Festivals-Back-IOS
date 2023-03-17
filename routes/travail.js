@@ -67,7 +67,7 @@ router.post("/", auth, async (req,res) => {
                 return res.status(409).send("Wrong body")
             }
             const travail = await pool.query("insert into travail (travail_benevole, travail_zone, travail_creneau) values ($1, $2, $3) returning *",[benevole,zone,creneau])
-            return res.status(200).json(travail.rows[0])
+            return res.status(200).json({ID:travail.rows[0].travail_id})
         }
         return res.status(403).send("Not Authorized")
     } catch (err) {
@@ -85,7 +85,7 @@ router.put("/:id", auth, async (req,res) => {
                 return res.status(409).send("Wrong body")
             }
             const travail = await pool.query("update travail set travail_benevole = $2, travail_zone = $3, travail_creneau = $4 where travail_id = $1 returning *",[id,benevole,zone,creneau])
-            return res.status(200).json(travail.rows[0])
+            return res.status(200).json({ID:travail.rows[0].travail_id})
         }
         return res.status(403).send("Not Authorized")
     } catch (err) {
@@ -98,7 +98,7 @@ router.delete("/:id", auth, async (req,res) => {
     try {
         if (req.role === "Admin") {
             const {id} = req.params
-            const travail = await pool.query("delete from travail where travail_id = $1",[id])
+            await pool.query("delete from travail where travail_id = $1",[id])
             return res.status(200).send("Deletion succeeded")
         }
         return res.status(403).send("Not Authorized")

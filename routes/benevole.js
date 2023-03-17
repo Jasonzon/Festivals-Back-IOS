@@ -15,7 +15,7 @@ router.get("/", auth, async (req,res) => {
     }
 })
 
-router.get("/id/:id", async (req,res) => {
+router.get("/:id", async (req,res) => {
     try {
         const {id} = req.params
         const benevole = await pool.query("select * from benevole where benevole_id = $1",[id])
@@ -29,21 +29,10 @@ router.get("/id/:id", async (req,res) => {
     }
 })
 
-router.get("/creneau/:id", async (req,res) => {
+router.get("/zone/:query", async (req,res) => {
     try {
-        const {id} = req.params
-        const allBenevoles = await pool.query("select * from benevole inner join travail on (travail.travail_benevole = benevole.benevole_id) inner join creneau on (creneau.creneau_id = travail.travail_creneau) where creneau_id = $1",[id])
-        return res.status(200).json(allBenevoles.rows)
-    } catch (err) {
-        console.error(err.message)
-        return res.status(500).send("Server error")
-    }
-})
-
-router.get("/zone/:id", async (req,res) => {
-    try {
-        const {id} = req.params
-        const allBenevoles = await pool.query("select * from benevole inner join travail on (travail.travail_benevole = benevole.benevole_id) inner join zone on (zone.zone_id = travail.travail_zone) where zone_id = $1",[id])
+        const {creneau,zone} = req.query
+        const allBenevoles = await pool.query("select * from benevole inner join travail on (travail.travail_benevole = benevole.benevole_id) inner join zone on (zone.zone_id = travail.travail_zone) where zone_id = $1 and creneau_id = $2",[zone,creneau])
         return res.status(200).json(allBenevoles.rows)
     } catch (err) {
         console.error(err.message)
@@ -67,7 +56,7 @@ router.post("/", auth, async (req,res) => {
             const bcryptPassword = await bcrypt.hash(password, salt)
             const newPolyuser = await pool.query("INSERT INTO benevole (benevole_nom, benevole_prenom, benevole_mail, benevole_password) VALUES ($1, $2, $3, $4) RETURNING *", [nom, prenom, mail, bcryptPassword])
             const token = jwtGenerator(newPolyuser.rows[0].benevole_id,newPolyuser.rows[0].benevole_role,newPolyuser.rows[0].benevole_mail)
-            return res.status(200).json({rows:newPolyuser.rows,token})
+            return res.set(token).status(200).json({ID:newPolyuser.rows[0].benevole_id})
         }
         return res.status(403).send("Not Authorized")
     } catch (err) {
@@ -93,7 +82,7 @@ router.put("/:id", auth, async (req,res) => {
                 return res.status(409).send("Already exists")
             }
             const benevole = await pool.query("update benevole set benevole_prenom = $2, benevole_nom = $3, benevole_mail = $4 where benevole_id = $1 returning *",[id,prenom,nom,mail])
-            return res.status(200).json(benevole.rows[0])
+            return res.status(200).json({ID:benevole.rows[0].benevole_id})
         }
         return res.status(403).send("Not Authorized")
     } catch (err) {
@@ -106,7 +95,7 @@ router.delete("/:id", auth, async (req,res) => {
     try {
         if (req.role === "Admin") {
             const {id} = req.params
-            const benevole = await pool.query("delete from benevole where benevole_id = $1 returning *",[id])
+            await pool.query("delete from benevole where benevole_id = $1",[id])
             return res.status(200).send("Deletion succeeded")
         }
         return res.status(403).send("Not Authorized")
