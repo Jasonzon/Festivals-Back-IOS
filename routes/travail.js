@@ -61,7 +61,7 @@ router.get("/creneau/:id", async (req,res) => {
 
 router.post("/", auth, async (req,res) => {
     try {
-        if (req.role === "admin") {
+        if (req.role === "Admin") {
             const {benevole,zone,creneau} = req.body
             if (!benevole || !zone || !creneau || typeof benevole !== "number" || typeof zone !== "number" || typeof creneau !== "number") {
                 return res.status(409).send("Wrong body")
@@ -78,7 +78,7 @@ router.post("/", auth, async (req,res) => {
 
 router.put("/:id", auth, async (req,res) => {
     try {
-        if (req.role === "admin") {
+        if (req.role === "Admin") {
             const {id} = req.params
             const {benevole,zone,creneau} = req.body
             if (!benevole || !zone || !creneau || typeof benevole !== "number" || typeof zone !== "number" || typeof creneau !== "number") {
@@ -96,7 +96,7 @@ router.put("/:id", auth, async (req,res) => {
 
 router.delete("/:id", auth, async (req,res) => {
     try {
-        if (req.role === "admin") {
+        if (req.role === "Admin") {
             const {id} = req.params
             const travail = await pool.query("delete from travail where travail_id = $1",[id])
             return res.status(200).send("Deletion succeeded")

@@ -11,7 +11,7 @@ module.exports = async (req, res, next) => {
         if (!payload) {
             return res.status(401).send("Not Authorized")
         }
-        req.polyuser = payload.polyuser
+        req.benevole = payload.benevole
         req.role = payload.role
         req.mail = payload.mail
         next()

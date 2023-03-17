@@ -2,7 +2,7 @@ const router = require("express").Router()
 const pool = require("../db")
 const auth = require("../utils/auth")
 
-const type_enum = ['enfant','famille','ambiance','initie','expert']
+const type_enum = ['Enfant','Famille','Ambiance','Initie','Expert']
 
 router.get("/", async (req,res) => {
     try {
@@ -30,7 +30,7 @@ router.get("/:id", async (req,res) => {
 
 router.post("/", auth, async (req,res) => {
     try {
-        if (req.role === "admin") {
+        if (req.role === "Admin") {
             const {name,type} = req.body
             if (!name || !type || typeof name !== "string" || typeof type !== "string" || name.length === 0 || !type_enum.includes(type)) {
                 return res.status(400).send("Wrong body")
@@ -47,7 +47,7 @@ router.post("/", auth, async (req,res) => {
 
 router.put("/:id", auth, async (req,res) => {
     try {
-        if (req.role === "admin") {
+        if (req.role === "Admin") {
             const {id} = req.params
             const {name,type} = req.body
             if (!name || !type || typeof name !== "string" || typeof type !== "string" || name.length === 0 || !type_enum.includes(type)) {
@@ -65,7 +65,7 @@ router.put("/:id", auth, async (req,res) => {
 
 router.delete("/:id", auth, async (req,res) => {
     try {
-        if (req.role === "admin") {
+        if (req.role === "Admin") {
             const {id} = req.params
             const jeu = await pool.query("delete from jeu where jeu_id = $1 returning *",[id])
             return res.status(200).send("Deletion succeeded")

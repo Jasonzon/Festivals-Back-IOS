@@ -50,7 +50,7 @@ router.get("/zone/:id", async (req,res) => {
 
 router.post("/", auth, async (req,res) => {
     try {
-        if (req.role === "admin") {
+        if (req.role === "Admin") {
             const {jeu,zone} = req.body
             if (!jeu || !zone || typeof jeu !== "number" || typeof zone !== "number") {
                 return res.status(400).send("Wrong body")
@@ -71,7 +71,7 @@ router.post("/", auth, async (req,res) => {
 
 router.put("/:id", auth, async (req,res) => {
     try {
-        if (req.role === "admin") {
+        if (req.role === "Admin") {
             const {id} = req.params
             const {jeu,zone} = req.body
             if (!jeu || !zone || typeof jeu !== "number" || typeof zone !== "number") {
@@ -93,7 +93,7 @@ router.put("/:id", auth, async (req,res) => {
 
 router.delete("/:id", auth, async (req,res) => {
     try {
-        if (req.role === "admin") {
+        if (req.role === "Admin") {
             const {id} = req.params
             const affectation = await pool.query("delete from affectation where affectation_id = $1",[id])
             return res.status(200).send("Deletion succeeded")

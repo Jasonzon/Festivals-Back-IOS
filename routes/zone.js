@@ -50,7 +50,7 @@ router.get("/benevole/:id", async (req,res) => {
 
 router.post("/", auth, async (req,res) => {
     try {
-        if (req.role === "admin") {
+        if (req.role === "Admin") {
             const {name} = req.body
             if (!name || typeof name !== "string" || name.length === 0) {
                 return res.status(409).send("Wrong body")
@@ -67,7 +67,7 @@ router.post("/", auth, async (req,res) => {
 
 router.put("/:id", auth, async (req,res) => {
     try {
-        if (req.role === "admin") {
+        if (req.role === "Admin") {
             const {id} = req.params
             const {name} = req.body
             if (!name || typeof name !== "string" || name.length === 0) {
@@ -85,7 +85,7 @@ router.put("/:id", auth, async (req,res) => {
 
 router.delete("/:id", auth, async (req,res) => {
     try {
-        if (req.role === "admin") {
+        if (req.role === "Admin") {
             const {id} = req.params
             const zone = await pool.query("delete from zone where zone_id = $1 returning *",[id])
             return res.status(200).send("Deletion succeeded")
