@@ -46,6 +46,29 @@ router.post("/", auth, async (req,res) => {
                 return res.status(409).send("Wrong body")
             }
             const jour = await pool.query("insert into jour (jour_name, jour_debut, jour_fin, jour_date, jour_festival) values ($1, $2, $3, $4, $5) returning *",[name,debut,fin,date,festival])
+            const debutJour = new Date(`${date} ${debut}`);
+            const finJour = new Date(`${date} ${fin}`);
+            const dureeCreneau = 2 * 60 * 60 * 1000; // 2 heures en millisecondes
+            const nbCreneaux = Math.floor((finJour - debutJour) / dureeCreneau);
+            let creneaux = [];
+            let debutCreneau = debutJour;
+            for (let i = 0; i < nbCreneaux; i++) {
+                var finCreneau
+                if (i != nbCreneaux-1) {
+                    finCreneau = new Date(debutCreneau.getTime() + dureeCreneau);
+                }
+                else {
+                    finCreneau = new Date(finJour)
+                }
+                const creneau = {
+                    creneau_debut: debutCreneau.toISOString().slice(11, 19),
+                    creneau_fin: finCreneau.toISOString().slice(11, 19),
+                    creneau_jour: jour.rows[0].jour_id
+                };
+                creneaux.push(creneau);
+                debutCreneau = finCreneau;
+            }
+            await pool.query("insert into creneau (creneau_debut, creneau_fin, creneau_jour) values ($1, $2, $3)", creneaux.map((creneau) => [creneau.creneau_debut, creneau.creneau_fin, creneau.creneau_jour]));
             return res.status(200).json({ID:jour.rows[0].jour_id})
         }
         return res.status(403).send("Not Authorized")

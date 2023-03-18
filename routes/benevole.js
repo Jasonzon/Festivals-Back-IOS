@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const jwtGenerator = require("../utils/jwtGenerator")
 
-router.get("/", auth, async (req,res) => {
+router.get("/", async (req,res) => {
     try {
         const allBenevoles = await pool.query("select * from benevole")
         return res.status(200).json(allBenevoles.rows)
