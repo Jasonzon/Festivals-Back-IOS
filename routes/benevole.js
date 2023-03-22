@@ -115,7 +115,7 @@ router.get("/auth", async (req,res) => {
         if (!payload) {
             return res.status(403).send("Not authorized")
         }
-        return res.status(200).json({benevole_id:payload.benevole,benevole_mail:payload.mail})
+        return res.status(200).json({id:payload.benevole})
     } catch (err) {
         console.error(err.message)
         return res.status(500).send("Server error")
@@ -133,9 +133,9 @@ router.post("/connect", async (req,res) => {
             const validPassword = await bcrypt.compare(password,newPolyuser.rows[0].benevole_password)
             if (validPassword) {
                 const token = jwtGenerator(newPolyuser.rows[0].benevole_id,newPolyuser.rows[0].benevole_role,newPolyuser.rows[0].benevole_mail)
-                return res.status(200).json({rows:newPolyuser.rows,token})
+                return res.status(200).json({benevole:newPolyuser.rows[0],token})
             }
-            return res.status(403).send({rows:[]})
+            return res.status(403).send("Not authorized")
         }
         return res.status(404).send("Not found")
     } catch (err) {
