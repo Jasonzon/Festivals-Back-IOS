@@ -4,6 +4,7 @@ const auth = require("../utils/auth")
 
 router.get("/", async (req,res) => {
     try {
+        console.log(`GET /zone`)
         const allZones = await pool.query("select * from zone")
         return res.status(200).json(allZones.rows)
     } catch (err) {
@@ -15,6 +16,7 @@ router.get("/", async (req,res) => {
 router.get("/festival/:id", async (req,res) => {
     try {
         const {id} = req.params
+        console.log(`GET /zone/festival/${id}`)
         const allZones = await pool.query("select * from zone where zone_festival = $1",[id])
         return res.status(200).json(allZones.rows)
     } catch (err) {
@@ -26,6 +28,7 @@ router.get("/festival/:id", async (req,res) => {
 router.get("/:id", async (req,res) => {
     try {
         const {id} = req.params
+        console.log(`GET /zone/${id}`)
         const zone = await pool.query("select * from zone where zone_id = $1",[id])
         if (zone.rows.length === 0) {
             return res.status(404).send("Not found")
@@ -39,12 +42,14 @@ router.get("/:id", async (req,res) => {
 
 router.post("/", auth, async (req,res) => {
     try {
+        console.log(`POST /zone`)
+        console.log(req.body)
         if (req.role === "Admin") {
-            const {name} = req.body
-            if (!name || typeof name !== "string" || name.length === 0) {
+            const {zone_name} = req.body
+            if (!zone_name || typeof zone_name !== "string" || zone_name.length === 0) {
                 return res.status(409).send("Wrong body")
             }
-            const zone = await pool.query("insert into zone (zone_name) values ($1) returning *",[name])
+            const zone = await pool.query("insert into zone (zone_name) values ($1) returning *",[zone_name])
             return res.status(200).json({ID:zone.rows[0].zone_id})
         }
         return res.status(403).send("Not Authorized")
@@ -56,13 +61,15 @@ router.post("/", auth, async (req,res) => {
 
 router.put("/:id", auth, async (req,res) => {
     try {
+        const {id} = req.params
+        console.log(`PUT /zone/${id}`)
+        console.log(req.body)
         if (req.role === "Admin") {
-            const {id} = req.params
-            const {name} = req.body
-            if (!name || typeof name !== "string" || name.length === 0) {
+            const {zone_name} = req.body
+            if (!zone_name || typeof zone_name !== "string" || zone_name.length === 0) {
                 return res.status(409).send("Wrong body")
             }
-            const zone = await pool.query("update zone set zone_name = $2 where zone_id = $1 returning *",[id,name])
+            const zone = await pool.query("update zone set zone_name = $2 where zone_id = $1 returning *",[id,zone_name])
             return res.status(200).json({ID:zone.rows[0].zone_id})
         }
         return res.status(403).send("Not Authorized")
@@ -74,8 +81,9 @@ router.put("/:id", auth, async (req,res) => {
 
 router.delete("/:id", auth, async (req,res) => {
     try {
+        const {id} = req.params
+        console.log(`DELETE /zone/${id}`)
         if (req.role === "Admin") {
-            const {id} = req.params
             await pool.query("delete from zone where zone_id = $1",[id])
             return res.status(200).send("Deletion succeeded")
         }

@@ -4,6 +4,7 @@ const auth = require("../utils/auth")
 
 router.get("/", async (req,res) => {
     try {
+        console.log(`GET /jour`)
         const allJours = await pool.query("select * from jour")
         return res.status(200).json(allJours.rows)
     } catch (err) {
@@ -15,6 +16,7 @@ router.get("/", async (req,res) => {
 router.get("/:id", async (req,res) => {
     try {
         const {id} = req.params
+        console.log(`GET /jour/${id}`)
         const jour = await pool.query("select * from jour where jour_id = $1",[id])
         if (jour.rows.length === 0) {
             return res.status(404).send("Not found")
@@ -29,6 +31,7 @@ router.get("/:id", async (req,res) => {
 router.get("/festival/:id", async (req,res) => {
     try {
         const {id} = req.params
+        console.log(`GET /jour/festival/${id}`)
         const jour = await pool.query("select * from jour where jour_festival = $1",[id])
         return res.status(200).json(jour.rows)
     } catch (err) {
@@ -39,15 +42,17 @@ router.get("/festival/:id", async (req,res) => {
 
 router.post("/", auth, async (req,res) => {
     try {
+        console.log(`POST /jour`)
+        console.log(req.body)
         if (req.role === "Admin") {
-            const {name,debut,fin,date,festival} = req.body
-            const check = await pool.query("select * from festival where festival_id = $1",[festival])
-            if (!name || !debut || !fin || !date || !festival || typeof debut !== "string" || typeof fin !== "string" || typeof festival !== "number" || typeof date !== "string" || typeof name !== "string" || name.length === 0 || debut.length === 0 || fin.length === 0 || date.length === 0 ||check.rows.length === 0) {
+            const {jour_name,jour_debut,jour_fin,jour_date,jour_festival} = req.body
+            const check = await pool.query("select * from festival where festival_id = $1",[jour_festival])
+            if (!jour_name || !jour_debut || !jour_fin || !jour_date || !jour_festival || typeof jour_debut !== "string" || typeof jour_fin !== "string" || typeof jour_festival !== "number" || typeof jour_date !== "string" || typeof jour_name !== "string" || jour_name.length === 0 || jour_debut.length === 0 || jour_fin.length === 0 || jour_date.length === 0 || check.rows.length === 0) {
                 return res.status(409).send("Wrong body")
             }
-            const jour = await pool.query("insert into jour (jour_name, jour_debut, jour_fin, jour_date, jour_festival) values ($1, $2, $3, $4, $5) returning *",[name,debut,fin,date,festival])
-            const debutJour = new Date(`${date} ${debut}`);
-            const finJour = new Date(`${date} ${fin}`);
+            const jour = await pool.query("insert into jour (jour_name, jour_debut, jour_fin, jour_date, jour_festival) values ($1, $2, $3, $4, $5) returning *",[jour_name,jour_debut,jour_fin,jour_date,jour_festival])
+            const debutJour = new Date(`${jour_date} ${jour_debut}`);
+            const finJour = new Date(`${jour_date} ${jour_fin}`);
             const dureeCreneau = 2 * 60 * 60 * 1000; // 2 heures en millisecondes
             const nbCreneaux = Math.floor((finJour - debutJour) / dureeCreneau);
             let creneaux = [];
@@ -80,13 +85,15 @@ router.post("/", auth, async (req,res) => {
 
 router.put("/:id", auth, async (req,res) => {
     try {
+        const {id} = req.params
+        console.log(`PUT /jour/${id}`)
+        console.log(req.body)
         if (req.role === "Admin") {
-            const {id} = req.params
-            const {name} = req.body
-            if (!name || typeof name !== "string" || name.length === 0) {
+            const {jour_name} = req.body
+            if (!jour_name || typeof jour_name !== "string" || jour_name.length === 0) {
                 return res.status(409).send("Wrong body")
             }
-            const jour = await pool.query("update jour set jour_name = $2 where jour_id = $1 returning *",[id,name])
+            const jour = await pool.query("update jour set jour_name = $2 where jour_id = $1 returning *",[id,jour_name])
             return res.status(200).json({ID:jour.rows[0].jour_id})
         }
         return res.status(403).send("Not Authorized")
@@ -98,8 +105,9 @@ router.put("/:id", auth, async (req,res) => {
 
 router.delete("/:id", auth, async (req,res) => {
     try {
+        const {id} = req.params
+        console.log(`DELETE /jour/${id}`)
         if (req.role === "Admin") {
-            const {id} = req.params
             await pool.query("delete from jour where jour_id = $1",[id])
             return res.status(200).send("Deletion succeeded")
         }
