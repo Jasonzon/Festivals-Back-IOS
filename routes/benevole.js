@@ -42,6 +42,7 @@ router.get("/zone/:query", async (req,res) => {
 
 router.post("/", async (req,res) => {
     try {
+        console.log(req.body)
         const {prenom,nom,mail,password} = req.body
         if (!prenom || !nom || !mail || !password || typeof password !== "string" || typeof nom !== "string" || typeof prenom !== "string" || typeof mail !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail) || password.length === 0 || nom.length === 0 || prenom.length === 0 || mail.length === 0) {
             return res.status(400).send("Wrong body")
