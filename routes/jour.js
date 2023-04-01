@@ -28,17 +28,29 @@ router.get("/:id", async (req,res) => {
     }
 })
 
-router.get("/festival/:id", async (req,res) => {
+router.get("/festival/:id", async (req, res) => {
     try {
-        const {id} = req.params
-        console.log(`GET /jour/festival/${id}`)
-        const jour = await pool.query("select * from jour where jour_festival = $1",[id])
-        return res.status(200).json(jour.rows)
+      const { id } = req.params;
+      console.log(`GET /jour/festival/${id}`);
+      const jour = await pool.query("SELECT * FROM jour WHERE jour_festival = $1", [id]);
+      const jourDate = new Date(jour.rows[0].jour_date);
+      const result = jour.rows.map((row) => {
+        const debutDate = new Date(`${jourDate.toISOString().substr(0, 10)} ${row.jour_debut}`);
+        const finDate = new Date(`${jourDate.toISOString().substr(0, 10)} ${row.jour_fin}`);
+        return {
+          ...row,
+          jour_debut: debutDate,
+          jour_fin: finDate,
+        };
+      });
+  
+      return res.status(200).json(result);
     } catch (err) {
-        console.error(err.message)
-        return res.status(500).send("Server error")
+      console.error(err.message);
+      return res.status(500).send("Server error");
     }
-})
+});
+  
 
 router.post("/", auth, async (req,res) => {
     try {
