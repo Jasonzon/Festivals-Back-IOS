@@ -77,7 +77,9 @@ router.post("/", auth, async (req,res) => {
                 creneaux.push(creneau);
                 debutCreneau = finCreneau;
             }
-            await pool.query("insert into creneau (creneau_debut, creneau_fin, creneau_jour) values ($1, $2, $3)", creneaux.map((creneau) => [creneau.creneau_debut, creneau.creneau_fin, creneau.creneau_jour]));
+            for (let creneau of creneaux) {
+                await pool.query("insert into creneau (creneau_debut, creneau_fin, creneau_jour) values ($1, $2, $3)", [creneau.creneau_debut, creneau.creneau_fin, creneau.creneau_jour]);
+            }
             return res.status(200).json({ID:jour.rows[0].jour_id})
         }
         return res.status(403).send("Not Authorized")
