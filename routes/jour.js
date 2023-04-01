@@ -52,9 +52,12 @@ router.post("/", auth, async (req,res) => {
             }
             const jour = await pool.query("insert into jour (jour_name, jour_debut, jour_fin, jour_date, jour_festival) values ($1, $2, $3, $4, $5) returning *",[jour_name,jour_debut,jour_fin,jour_date,jour_festival])
             const debutJour = new Date(`${jour_date} ${jour_debut}`);
+            console.log(debutJour)
             const finJour = new Date(`${jour_date} ${jour_fin}`);
+            console.log(finJour)
             const dureeCreneau = 2 * 60 * 60 * 1000; // 2 heures en millisecondes
             const nbCreneaux = Math.floor((finJour - debutJour) / dureeCreneau);
+            console.log(nbCreneaux)
             let creneaux = [];
             let debutCreneau = debutJour;
             for (let i = 0; i < nbCreneaux; i++) {
@@ -70,6 +73,7 @@ router.post("/", auth, async (req,res) => {
                     creneau_fin: finCreneau.toISOString().slice(11, 19),
                     creneau_jour: jour.rows[0].jour_id
                 };
+                console.log(creneau)
                 creneaux.push(creneau);
                 debutCreneau = finCreneau;
             }
