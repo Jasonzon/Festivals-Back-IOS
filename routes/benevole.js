@@ -36,7 +36,7 @@ router.get("/zone", async (req,res) => {
         const {creneau,zone} = req.query
         console.log("GET /zone/query")
         console.log(req.query)
-        const allBenevoles = await pool.query("select * from benevole inner join travail on (travail.travail_benevole = benevole.benevole_id) inner join zone on (zone.zone_id = travail.travail_zone) where zone_id = $1 and creneau_id = $2",[zone,creneau])
+        const allBenevoles = await pool.query("select * from benevole inner join travail on (travail.travail_benevole = benevole.benevole_id) where travail_zone = $1 and travail_creneau = $2",[zone,creneau])
         return res.status(200).json(allBenevoles.rows)
     } catch (err) {
         console.error(err.message)
