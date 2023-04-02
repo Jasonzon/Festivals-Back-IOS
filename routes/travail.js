@@ -68,8 +68,8 @@ router.post("/", auth, async (req,res) => {
     try {
         console.log(`POST /travail`)
         console.log(req.body)
-        if (req.role === "Admin") {
-            const {travail_benevole,travail_zone,travail_creneau} = req.body
+        const {travail_benevole,travail_zone,travail_creneau} = req.body
+        if (req.benevole === travail_benevole) {
             if (!travail_benevole || !travail_zone || !travail_creneau || typeof travail_benevole !== "number" || typeof travail_zone !== "number" || typeof travail_creneau !== "number") {
                 return res.status(409).send("Wrong body")
             }
