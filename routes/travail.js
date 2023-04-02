@@ -103,24 +103,11 @@ router.put("/:id", auth, async (req,res) => {
     }
 })
 
-router.delete("/:id", auth, async (req,res) => {
-    try {
-        const {id} = req.params
-        console.log(`DELETE /travail/${id}`)
-        if (req.role === "Admin") {
-            await pool.query("delete from travail where travail_id = $1",[id])
-            return res.status(200).send("Deletion succeeded")
-        }
-        return res.status(403).send("Not Authorized")
-    } catch (err) {
-        console.error(err.message)
-        return res.status(500).send("Server error")
-    }
-})
-
 router.delete("/query", auth, async (req,res) => {
     try {
+        console.log("DELETE /travail/query")
         const {benevole,creneau,zone} = req.query
+        console.log(req.query)
         if (req.benevole.toString() === benevole.toString()) {
             await pool.query("delete from travail where travail_benevole = $1 and travail_creneau = $2 and travail_zone = $3",[benevole,creneau,zone])
             return res.status(200).send("Deletion succeeded")
