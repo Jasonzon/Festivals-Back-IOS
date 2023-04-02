@@ -51,15 +51,14 @@ router.post("/", async (req,res) => {
             return res.status(400).send("Wrong body")
         }
         const check = await pool.query("select * from benevole where benevole_mail = $1",[benevole_mail])
-        if (check.rows.length !== 0) {
-            return res.status(409).send("Already exists")
+        if (check.rows.length === 0) {
+            const saltRound = 10
+            const salt = await bcrypt.genSalt(saltRound)
+            const bcryptPassword = await bcrypt.hash(benevole_password, salt)
+            const newPolyuser = await pool.query("INSERT INTO benevole (benevole_nom, benevole_prenom, benevole_mail, benevole_password) VALUES ($1, $2, $3, $4) RETURNING *", [benevole_nom, benevole_prenom, benevole_mail, bcryptPassword])
+            return res.status(200).json({ID:newPolyuser.rows[0].benevole_id})
         }
-        const saltRound = 10
-        const salt = await bcrypt.genSalt(saltRound)
-        const bcryptPassword = await bcrypt.hash(benevole_password, salt)
-        const newPolyuser = await pool.query("INSERT INTO benevole (benevole_nom, benevole_prenom, benevole_mail, benevole_password) VALUES ($1, $2, $3, $4) RETURNING *", [benevole_nom, benevole_prenom, benevole_mail, bcryptPassword])
-        const token = jwtGenerator(newPolyuser.rows[0].benevole_id,newPolyuser.rows[0].benevole_role,newPolyuser.rows[0].benevole_mail)
-        return res.set(token).status(200).json({ID:newPolyuser.rows[0].benevole_id})
+        return res.status(409).send("Already exists")
     } catch (err) {
         console.error(err.message)
         return res.status(500).send("Server error")

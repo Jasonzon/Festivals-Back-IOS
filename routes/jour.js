@@ -51,7 +51,6 @@ router.get("/festival/:id", async (req, res) => {
     }
 });
   
-
 router.post("/", auth, async (req,res) => {
     try {
         console.log(`POST /jour`)
