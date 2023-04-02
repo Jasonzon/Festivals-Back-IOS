@@ -118,4 +118,18 @@ router.delete("/:id", auth, async (req,res) => {
     }
 })
 
+router.delete("/query", auth, async (req,res) => {
+    try {
+        const {benevole,creneau,zone} = req.query
+        if (req.benevole.toString() === benevole.toString()) {
+            await pool.query("delete from travail where travail_benevole = $1 and travail_creneau = $2 and travail_zone = $3",[benevole,creneau,zone])
+            return res.status(200).send("Deletion succeeded")
+        }
+        return res.status(403).send("Not Authorized")
+    } catch (err) {
+        console.error(err.message)
+        return res.status(500).send("Server error")
+    }
+})
+
 module.exports = router
