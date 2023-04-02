@@ -31,7 +31,7 @@ router.get("/id/:id", async (req,res) => {
     }
 })
 
-router.get("/zone/:query", async (req,res) => {
+router.get("/zone", async (req,res) => {
     try {
         const {creneau,zone} = req.query
         console.log("GET /zone/query")
