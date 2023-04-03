@@ -45,11 +45,11 @@ router.post("/", auth, async (req,res) => {
         console.log(`POST /zone`)
         console.log(req.body)
         if (req.role === "Admin") {
-            const {zone_name} = req.body
-            if (!zone_name || typeof zone_name !== "string" || zone_name.length === 0) {
+            const {zone_name, zone_benevoles} = req.body
+            if (!zone_name || !zone_benevoles || typeof zone_benevoles != "number" || typeof zone_name !== "string" || zone_name.length === 0) {
                 return res.status(409).send("Wrong body")
             }
-            const zone = await pool.query("insert into zone (zone_name) values ($1) returning *",[zone_name])
+            const zone = await pool.query("insert into zone (zone_name, zone_benevoles) values ($1, $2) returning *",[zone_name, zone_benevoles])
             return res.status(200).json({ID:zone.rows[0].zone_id})
         }
         return res.status(403).send("Not Authorized")
