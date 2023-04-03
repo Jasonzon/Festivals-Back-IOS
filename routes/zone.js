@@ -46,7 +46,7 @@ router.post("/", auth, async (req,res) => {
         console.log(req.body)
         if (req.role === "Admin") {
             const {zone_name, zone_benevoles, zone_festival} = req.body
-            if (!zone_name ||zone_festival || typeof zone_festival != "number" || !zone_benevoles || typeof zone_benevoles != "number" || typeof zone_name !== "string" || zone_name.length === 0) {
+            if (!zone_name || !zone_festival || typeof zone_festival !== "number" || !zone_benevoles || typeof zone_benevoles !== "number" || typeof zone_name !== "string" || zone_name.length === 0) {
                 return res.status(409).send("Wrong body")
             }
             const zone = await pool.query("insert into zone (zone_name, zone_benevoles, zone_festival) values ($1, $2, $3) returning *",[zone_name, zone_benevoles, zone_festival])
